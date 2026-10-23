@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="uk"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Міні-CRM «Зелена Полиця»</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F4F8F7;--panel:#FFFFFF;--ink:#16262B;--muted:#5C7078;--line:#D5E0DE;--soft:#EDF3F2;--runbg:#0B2A33;--runfg:#FFFFFF;
+ --s0:#7A8F95;--s1:#028090;--s2:#B77A17;--s3:#2E7D5B;--s4:#B23A31;--errbg:#FBEDEB;--okbg:#FBF3E2;color-scheme:light;
+ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E1C21;--panel:#132A31;--ink:#E3ECEB;--muted:#93A9AE;--line:#24414A;--soft:#18343C;--runbg:#3BD9B0;--runfg:#08171B;
+ --s0:#93A9AE;--s1:#2DB5B5;--s2:#E1A84A;--s3:#5FCB9A;--s4:#F08A80;--errbg:#3A1F1D;--okbg:#3A3020;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0E1C21;--panel:#132A31;--ink:#E3ECEB;--muted:#93A9AE;--line:#24414A;--soft:#18343C;--runbg:#3BD9B0;--runfg:#08171B;
+ --s0:#93A9AE;--s1:#2DB5B5;--s2:#E1A84A;--s3:#5FCB9A;--s4:#F08A80;--errbg:#3A1F1D;--okbg:#3A3020;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1320px;margin:0 auto;padding:18px 20px 40px}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 20px;margin-bottom:14px}
+h1{font-size:22px;font-weight:600;margin:0}header p{margin:0;color:var(--muted);font-size:14px}
+nav{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+nav button{font:500 14px "IBM Plex Sans",sans-serif;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer}
+nav button[aria-selected="true"]{background:var(--runbg);color:var(--runfg);border-color:var(--runbg)}
+nav .spacer{flex:1}
+.board{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.col{background:var(--soft);border-radius:10px;padding:10px;min-width:0}
+.col h2{font-size:14px;margin:0 0 8px;display:flex;justify-content:space-between;align-items:center;border-top:4px solid var(--c);padding-top:8px}
+.col h2 span{font-weight:400;color:var(--muted);font-size:13px}
+.deal{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-bottom:7px;cursor:pointer;font:14px "IBM Plex Sans",sans-serif;color:var(--ink)}
+.deal:hover{border-color:var(--c)}.deal.sel{outline:2px solid var(--c)}
+.deal b{display:block;font-weight:600;font-size:14px;line-height:1.3}
+.deal small{display:flex;justify-content:space-between;gap:6px;color:var(--muted);font-size:12px;margin-top:3px}
+.deal .stale{color:var(--s4);font-weight:600}
+.deal .new{color:var(--s1);font-weight:600}
+.layout{display:grid;grid-template-columns:1fr 360px;gap:16px;align-items:start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;min-width:0}
+.card h3{margin:0 0 4px;font-size:17px}
+.meta{font-size:13px;color:var(--muted);margin:0 0 10px}
+.pill{display:inline-block;font-size:12px;font-weight:600;border-radius:999px;padding:2px 9px;color:#fff;background:var(--c)}
+.hist{list-style:none;margin:8px 0 12px;padding:0;border-left:2px solid var(--line)}
+.hist li{padding:3px 0 3px 12px;font-size:14px;position:relative}
+.hist li::before{content:"";position:absolute;left:-5px;top:10px;width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.hist small{color:var(--muted)}
+label{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--muted);margin-bottom:8px}
+select,input{font:15px "IBM Plex Sans",sans-serif;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 9px;width:100%}
+.btn{font:500 14px "IBM Plex Sans",sans-serif;border-radius:8px;padding:8px 13px;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+.btn.main{background:var(--runbg);color:var(--runfg);border-color:var(--runbg)}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 10px}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+.msg{padding:8px 11px;border-radius:8px;font-size:14px;margin-top:8px}
+.msg.err{background:var(--errbg);color:var(--s4)}.msg.ok{background:var(--okbg)}
+.funnel{display:flex;flex-direction:column;gap:8px;margin:6px 0 4px}
+.fr{display:grid;grid-template-columns:120px 1fr 160px;gap:10px;align-items:center;font-size:14px}
+.bar{height:26px;border-radius:6px;background:var(--c);color:#fff;font-weight:600;font-size:13px;display:flex;align-items:center;padding-left:8px;min-width:34px}
+.conv{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.kpi span{display:block;font-size:13px;color:var(--muted)}.kpi b{font:600 22px "IBM Plex Sans",sans-serif;font-variant-numeric:tabular-nums}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{font:600 12px "IBM Plex Sans",sans-serif;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.note{color:var(--muted);font-size:13px;margin:0 0 10px}
+@media (max-width:1100px){.board{grid-template-columns:repeat(3,minmax(0,1fr))}.layout{grid-template-columns:1fr}}
+@media (max-width:700px){.board{grid-template-columns:1fr}.kpis,.grid2{grid-template-columns:1fr 1fr}.fr{grid-template-columns:90px 1fr 70px}}
+.deal .what{display:block;color:var(--muted);font-size:12px}
+</style></head><body><div class="wrap">
+<header><h1>Міні-CRM «Зелена Полиця»</h1><p>Роздрібні продажі: звернення клієнтів з Instagram, сайту й Viber. Дані навчальні.</p></header>
+<nav id="nav"></nav><main id="view"></main></div>
+<script>
+const SEED=[{"id": "Z-001", "who": "Юлія Гончар", "city": "Полтава", "ch": "Instagram Direct", "prod": "Сироватка з вітаміном С", "sum": 489, "pay": "Картка онлайн", "type": "новий", "st": "won", "lostAt": null, "ago": 1, "why": null}, {"id": "Z-002", "who": "Олена Поліщук", "city": "Полтава", "ch": "Instagram Direct", "prod": "Крем для рук з обліпихою", "sum": 328, "pay": "Накладений платіж", "type": "постійний", "st": "won", "lostAt": null, "ago": 2, "why": null}, {"id": "Z-003", "who": "Марія Марченко", "city": "Львів", "ch": "Instagram Direct", "prod": "Маска для волосся", "sum": 274, "pay": "Картка онлайн", "type": "постійний", "st": "won", "lostAt": null, "ago": 1, "why": null}, {"id": "Z-004", "who": "Дмитро Данилюк", "city": "Львів", "ch": "Instagram Direct", "prod": "Олія арганова", "sum": 356, "pay": "Накладений платіж", "type": "новий", "st": "lost", "lostAt": "lead", "ago": 6, "why": "Не дочекався відповіді"}, {"id": "Z-005", "who": "Юлія Руденко", "city": "Львів", "ch": "Instagram Direct", "prod": "Скраб кавовий", "sum": 148, "pay": "Накладений платіж", "type": "новий", "st": "lost", "lostAt": "lead", "ago": 8, "why": "Не дочекався відповіді"}, {"id": "Z-006", "who": "Ірина Коваль", "city": "Харків", "ch": "Instagram Direct", "prod": "Шампунь безсульфатний", "sum": 238, "pay": "Накладений платіж", "type": "новий", "st": "lost", "lostAt": "lead", "ago": 5, "why": "Не дочекався відповіді"}, {"id": "Z-007", "who": "Павло Захарчук", "city": "Київ", "ch": "Instagram Direct", "prod": "Бальзам для губ", "sum": 178, "pay": "Картка онлайн", "type": "новий", "st": "lost", "lostAt": "lead", "ago": 9, "why": "Не дочекався відповіді"}, {"id": "Z-008", "who": "Ірина Гаврилюк", "city": "Львів", "ch": "Instagram Direct", "prod": "Сироватка з вітаміном С", "sum": 489, "pay": "Накладений платіж", "type": "новий", "st": "lost", "lostAt": "offer", "ago": 4, "why": "Не забрав посилку"}, {"id": "Z-009", "who": "Наталія Шевченко", "city": "Полтава", "ch": "Instagram Direct", "prod": "Дезодорант мінеральний", "sum": 264, "pay": "Накладений платіж", "type": "новий", "st": "lost", "lostAt": "offer", "ago": 7, "why": "Не забрав посилку"}, {"id": "Z-010", "who": "Артем Данилюк", "city": "Київ", "ch": "Instagram Direct", "prod": "Фініки Меджул", "sum": 312, "pay": "Накладений платіж", "type": "новий", "st": "offer", "lostAt": null, "ago": 1, "why": null}, {"id": "Z-011", "who": "Роман Марченко", "city": "Полтава", "ch": "Instagram Direct", "prod": "Кава в зернах, Ефіопія", "sum": 342, "pay": "Картка онлайн", "type": "новий", "st": "contact", "lostAt": null, "ago": 4, "why": null}, {"id": "Z-012", "who": "Андрій Шевченко", "city": "Київ", "ch": "Instagram Direct", "prod": "Матча церемоніальна", "sum": 428, "pay": "Картка онлайн", "type": "новий", "st": "lead", "lostAt": null, "ago": 3, "why": null}, {"id": "Z-013", "who": "Марія Данилюк", "city": "Полтава", "ch": "Сайт", "prod": "Кіноа біла", "sum": 378, "pay": "Картка онлайн", "type": "постійний", "st": "won", "lostAt": null, "ago": 2, "why": null}, {"id": "Z-014", "who": "Артем Руденко", "city": "Полтава", "ch": "Сайт", "prod": "Кава в зернах, Ефіопія", "sum": 684, "pay": "Картка онлайн", "type": "постійний", "st": "won", "lostAt": null, "ago": 1, "why": null}, {"id": "Z-015", "who": "Андрій Кравчук", "city": "Івано-Франківськ", "ch": "Сайт", "prod": "Гель для прання", "sum": 424, "pay": "Картка онлайн", "type": "постійний", "st": "won", "lostAt": null, "ago": 2, "why": null}, {"id": "Z-016", "who": "Катерина Лисенко", "city": "Івано-Франківськ", "ch": "Сайт", "prod": "Чай улун листовий", "sum": 352, "pay": "Накладений платіж", "type": "новий", "st": "won", "lostAt": null, "ago": 1, "why": null}, {"id": "Z-017", "who": "Оксана Марченко", "city": "Дніпро", "ch": "Сайт", "prod": "Таблетки для ПММ", "sum": 298, "pay": "Картка онлайн", "type": "постійний", "st": "won", "lostAt": null, "ago": 2, "why": null}, {"id": "Z-018", "who": "Тетяна Бондар", "city": "Київ", "ch": "Сайт", "prod": "Мигдаль сирий", "sum": 536, "pay": "Накладений платіж", "type": "новий", "st": "lost", "lostAt": "offer", "ago": 5, "why": "Не забрав посилку"}, {"id": "Z-019", "who": "Василь Кравець", "city": "Одеса", "ch": "Сайт", "prod": "Сироватка з вітаміном С", "sum": 489, "pay": "Картка онлайн", "type": "новий", "st": "lost", "lostAt": "contact", "ago": 6, "why": "Дорого"}, {"id": "Z-020", "who": "Світлана Мороз", "city": "Київ", "ch": "Сайт", "prod": "Олія арганова", "sum": 356, "pay": "Картка онлайн", "type": "постійний", "st": "offer", "lostAt": null, "ago": 1, "why": null}, {"id": "Z-021", "who": "Олег Ткаченко", "city": "Харків", "ch": "Сайт", "prod": "Рис басматі", "sum": 316, "pay": "Накладений платіж", "type": "новий", "st": "contact", "lostAt": null, "ago": 6, "why": null}, {"id": "Z-022", "who": "Галина Петренко", "city": "Одеса", "ch": "Сайт", "prod": "Какао терте", "sum": 196, "pay": "Накладений платіж", "type": "новий", "st": "lead", "lostAt": null, "ago": 3, "why": null}, {"id": "Z-023", "who": "Сергій Литвин", "city": "Київ", "ch": "Viber / телефон", "prod": "Кешʼю смажений", "sum": 498, "pay": "Картка онлайн", "type": "постійний", "st": "won", "lostAt": null, "ago": 1, "why": null}, {"id": "Z-024", "who": "Людмила Савчук", "city": "Львів", "ch": "Viber / телефон", "prod": "Фундук очищений", "sum": 289, "pay": "Картка онлайн", "type": "постійний", "st": "won", "lostAt": null, "ago": 2, "why": null}, {"id": "Z-025", "who": "Віктор Гнатюк", "city": "Дніпро", "ch": "Viber / телефон", "prod": "Чай улун листовий", "sum": 176, "pay": "Накладений платіж", "type": "постійний", "st": "won", "lostAt": null, "ago": 1, "why": null}, {"id": "Z-026", "who": "Надія Руденко", "city": "Полтава", "ch": "Viber / телефон", "prod": "Курага", "sum": 296, "pay": "Картка онлайн", "type": "постійний", "st": "won", "lostAt": null, "ago": 2, "why": null}, {"id": "Z-027", "who": "Богдан Ковальчук", "city": "Київ", "ch": "Viber / телефон", "prod": "Олія арганова", "sum": 356, "pay": "Картка онлайн", "type": "новий", "st": "lost", "lostAt": "contact", "ago": 4, "why": "Немає в наявності"}, {"id": "Z-028", "who": "Оксана Кравчук", "city": "Харків", "ch": "Viber / телефон", "prod": "Крем для рук з обліпихою", "sum": 164, "pay": "Накладений платіж", "type": "новий", "st": "lost", "lostAt": "lead", "ago": 3, "why": "Передумав"}, {"id": "Z-029", "who": "Микола Бойко", "city": "Одеса", "ch": "Viber / телефон", "prod": "Гречка зелена", "sum": 208, "pay": "Накладений платіж", "type": "новий", "st": "contact", "lostAt": null, "ago": 2, "why": null}, {"id": "Z-030", "who": "Ганна Мельник", "city": "Київ", "ch": "Viber / телефон", "prod": "Сочевиця червона", "sum": 192, "pay": "Картка онлайн", "type": "новий", "st": "lead", "lostAt": null, "ago": 5, "why": null}, {"id": "Z-031", "who": "Ірина Савченко", "city": "Київ", "ch": "Instagram Direct", "prod": "Сироватка з вітаміном С", "sum": 489, "pay": "Картка онлайн", "type": "новий", "st": "lead", "lostAt": null, "ago": 0, "why": null}, {"id": "Z-032", "who": "Максим Ткач", "city": "Львів", "ch": "Сайт", "prod": "Кава в зернах, Ефіопія", "sum": 684, "pay": "Накладений платіж", "type": "постійний", "st": "lead", "lostAt": null, "ago": 0, "why": null}, {"id": "Z-033", "who": "Софія Бондаренко", "city": "Одеса", "ch": "Viber / телефон", "prod": "Олія арганова", "sum": 356, "pay": "Картка онлайн", "type": "новий", "st": "lead", "lostAt": null, "ago": 0, "why": null}, {"id": "Z-034", "who": "Денис Лисенко", "city": "Харків", "ch": "Instagram Direct", "prod": "Фініки Меджул", "sum": 312, "pay": "Накладений платіж", "type": "новий", "st": "lead", "lostAt": null, "ago": 0, "why": null}];
+const ST=[["lead","Звернення","var(--s0)"],["contact","Консультація","var(--s1)"],["offer","Замовлення","var(--s2)"],["won","Отримано","var(--s3)"],["lost","Скасовано","var(--s4)"]];
+const SN=Object.fromEntries(ST.map(s=>[s[0],s[1]])),SC=Object.fromEntries(ST.map(s=>[s[0],s[2]]));
+const RANK={lead:0,contact:1,offer:2,won:3},STALE=2;const ACC={contact:"Консультацію",offer:"Замовлення",won:"Отримано"};
+const ACTS=["Відповідь клієнту","Дзвінок","Замовлення оформлено","Посилку відправлено","Клієнт отримав посилку"];
+const NEED={lead:{to:"contact",ok:a=>["Відповідь клієнту","Дзвінок"].includes(a),txt:"Щоб перейти в «Консультацію», потрібна дія «Відповідь клієнту» або «Дзвінок». Не можна вважати клієнта проконсультованим, якщо йому ніхто не відповів."},
+ contact:{to:"offer",ok:a=>a=="Замовлення оформлено",txt:"Щоб перейти в «Замовлення», додайте дію «Замовлення оформлено» — клієнт підтвердив товар, адресу й спосіб оплати."},
+ offer:{to:"won",ok:a=>a=="Клієнт отримав посилку",txt:"Щоб перейти в «Отримано», додайте дію «Клієнт отримав посилку». Відправлена посилка — ще не продаж: її можуть не забрати."}};
+const WHY=["Не дочекався відповіді","Дорого","Немає в наявності","Не забрав посилку","Передумав"];
+function hist(d){const r=d.st=="lost"?RANK[d.lostAt]:RANK[d.st];const h=[{a:"Нове звернення ("+d.ch+"): "+d.prod,ago:d.ago+(r>=1?3:0)}];
+ if(r>=1)h.push({a:"Відповідь клієнту",ago:d.ago+2});if(r>=2){h.push({a:"Замовлення оформлено ("+d.pay+")",ago:d.ago+1});h.push({a:"Посилку відправлено",ago:d.ago+1})}
+ if(r>=3)h.push({a:"Клієнт отримав посилку",ago:d.ago});if(d.st=="lost")h.push({a:"Скасовано: "+d.why,ago:d.ago});return h}
+const INIT=()=>({deals:SEED.map(d=>Object.assign({},d,{h:hist(d)})),sel:null});
+let S;try{S=JSON.parse(localStorage.getItem("zp_crm_b2c"))}catch(e){}
+if(!S||!S.deals)S=INIT();
+let tab="board",note=null;
+const save=()=>{try{localStorage.setItem("zp_crm_b2c",JSON.stringify(S))}catch(e){}};
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const num=n=>n.toLocaleString("uk-UA");
+const D=id=>S.deals.find(d=>d.id==id);
+const active=d=>["lead","contact","offer"].includes(d.st);
+const ago=n=>n==0?"сьогодні":n+" дн. тому";
+function reach(d){return d.st=="lost"?RANK[d.lostAt]:RANK[d.st]}
+function addAct(id,a,txt){if(!a){note={t:"err",m:"Спершу оберіть дію зі списку, а потім натисніть «Додати дію»."};return render()}const d=D(id);d.h.push({a:a+(txt?": "+txt:""),ago:0});d.ago=0;const nx=NEED[d.st];note={t:"ok",m:`Додано: ${a}.`+(nx&&nx.ok(a)?` Тепер можна переміщувати далі.`:"")};save();render()}
+function move(id){const d=D(id),r=NEED[d.st];if(!r)return;
+ if(!d.h.some(x=>r.ok(x.a.split(/[:(]/)[0].trim()))){const sel=document.getElementById("act"),v=sel?sel.value:"";
+  note={t:"err",m:(v&&r.ok(v))?`Ви вибрали «${v}», але ще не додали її. Спершу натисніть «Додати дію», а потім «Перемістити».`:"CRM не дає перемістити звернення. "+r.txt};return render()}
+ d.st=r.to;d.ago=0;d.h.push({a:"Етап → «"+SN[r.to]+"»",ago:0});note={t:"ok",m:`Переміщено в «${ACC[r.to]}».`};save();render()}
+function lose(id,why){const d=D(id);d.lostAt=d.st;d.st="lost";d.why=why;d.ago=0;d.h.push({a:"Скасовано: "+why,ago:0});note={t:"ok",m:"Позначено скасованим. Причина піде у звіт."};save();render()}
+function card(d){const stale=active(d)&&d.ago>STALE,nw=d.ago==0&&d.h.length==1;
+ return `<button class="deal ${S.sel==d.id?"sel":""}" style="--c:${SC[d.st]}" data-deal="${d.id}"><b>${esc(d.who)}</b><span class="what">${esc(d.prod)} · ${num(d.sum)} грн</span><small><span>${esc(d.ch)}${d.type=="постійний"?" · постійний":""}</span><span class="${stale?"stale":nw?"new":""}">${stale?"без дій "+d.ago+" дн.":nw?"нове":ago(d.ago)}</span></small></button>`}
+function panel(){const d=D(S.sel);if(!d)return `<section class="card" id="panel"><h3>Картка клієнта</h3><p class="note">Клацніть будь-яке звернення на дошці, щоб побачити історію клієнта й дії.</p></section>`;
+ const r=NEED[d.st];
+ return `<section class="card" id="panel"><p class="meta">${d.id} · <span class="pill" style="--c:${SC[d.st]}">${SN[d.st]}</span></p><h3>${esc(d.who)}</h3>
+ <p class="meta">${esc(d.city)} · ${d.type=="постійний"?"постійний клієнт":"новий клієнт"} · канал: ${esc(d.ch)}<br>${esc(d.prod)} · ${num(d.sum)} грн · оплата: ${esc(d.pay)}</p>
+ <b style="font-size:13px">Історія клієнта</b><ul class="hist">${d.h.map(x=>`<li>${esc(x.a)} <small>· ${ago(x.ago)}</small></li>`).join("")}</ul>
+ ${active(d)?`<label>Нова дія<select id="act"><option value="">Оберіть дію…</option>${ACTS.map(a=>`<option>${a}</option>`).join("")}</select></label><label>Коментар (не обов'язково)<input id="actn" maxlength="120"></label>
+ <div class="row"><button class="btn" data-add="${d.id}">Додати дію</button><button class="btn main" data-move="${d.id}">Перемістити в «${ACC[r.to]}» →</button></div>
+ <label>Або скасувати<select id="why">${WHY.map(w=>`<option>${w}</option>`).join("")}</select></label>
+ <button class="btn" data-lose="${d.id}">Позначити скасованим</button>`:`<p class="note">Звернення закрите — дії більше не потрібні.</p>`}
+ ${note?`<div class="msg ${note.t}">${esc(note.m)}</div>`:""}</section>`}
+function vBoard(){return `<div class="layout"><div class="board">${ST.map(([k,n,c])=>{const ds=S.deals.filter(d=>d.st==k);return `<section class="col" style="--c:${c}"><h2>${n}<span>${ds.length}</span></h2>${ds.map(card).join("")}</section>`}).join("")}</div>${panel()}</div>`}
+function vRep(){const ds=S.deals,n=ds.length,c=ds.filter(d=>reach(d)>=1).length,o=ds.filter(d=>reach(d)>=2).length,w=ds.filter(d=>d.st=="won");const ws=w.reduce((a,d)=>a+d.sum,0);
+ const pc=(a,b)=>b?Math.round(a/b*100)+"%":"—";const stale=ds.filter(d=>active(d)&&d.ago>STALE);
+ const rows=[["Звернення",n,"",ST[0][2]],["Консультація",c,pc(c,n)+" від звернень",ST[1][2]],["Замовлення",o,pc(o,c)+" від консультацій",ST[2][2]],["Отримано",w.length,pc(w.length,o)+" від замовлень",ST[3][2]]];
+ const by=key=>{const g={};ds.forEach(d=>{const k=d[key];g[k]=g[k]||{n:0,w:0,s:0};g[k].n++;if(d.st=="won"){g[k].w++;g[k].s+=d.sum}});return Object.entries(g)};
+ const pay={};ds.filter(d=>reach(d)>=2).forEach(d=>{pay[d.pay]=pay[d.pay]||{n:0,l:0};pay[d.pay].n++;if(d.st=="lost")pay[d.pay].l++});
+ const why={};ds.filter(d=>d.st=="lost").forEach(d=>why[d.why]=(why[d.why]||0)+1);
+ return `<div class="kpis"><div class="kpi"><span>Отримано замовлень</span><b>${w.length}</b></div><div class="kpi"><span>Сума отриманих, грн</span><b>${num(ws)}</b></div>
+ <div class="kpi"><span>Конверсія «Звернення → Отримано»</span><b>${pc(w.length,n)}</b></div><div class="kpi"><span>Завислі звернення (понад ${STALE} дні без дій)</span><b>${stale.length}</b></div></div>
+ <section class="card"><h3>Воронка</h3><p class="note">Скільки звернень дійшли щонайменше до кожного етапу. Скасовані рахуються до того етапу, на якому їх скасували.</p><div class="funnel">${rows.map(r=>`<div class="fr"><span>${r[0]}</span><div><div class="bar" style="--c:${r[3]};width:${Math.max(4,r[1]/n*100)}%">${r[1]}</div></div><span class="conv">${r[2]}</span></div>`).join("")}</div></section>
+ <div class="grid2"><section class="card"><h3>Канали</h3><div class="tw"><table><thead><tr><th>Канал</th><th class="num">Звернень</th><th class="num">Отримано</th><th class="num">Конверсія</th><th class="num">Сума, грн</th></tr></thead><tbody>${by("ch").map(([k,g])=>`<tr><td>${esc(k)}</td><td class="num">${g.n}</td><td class="num">${g.w}</td><td class="num">${pc(g.w,g.n)}</td><td class="num">${num(g.s)}</td></tr>`).join("")}</tbody></table></div></section>
+ <section class="card"><h3>Нові й постійні клієнти</h3><div class="tw"><table><thead><tr><th>Клієнти</th><th class="num">Звернень</th><th class="num">Отримано</th><th class="num">Конверсія</th></tr></thead><tbody>${by("type").map(([k,g])=>`<tr><td>${k=="постійний"?"Постійні":"Нові"}</td><td class="num">${g.n}</td><td class="num">${g.w}</td><td class="num">${pc(g.w,g.n)}</td></tr>`).join("")}</tbody></table></div></section>
+ <section class="card"><h3>Спосіб оплати</h3><p class="note">Лише оформлені замовлення: скільки з них скасували після оформлення.</p><div class="tw"><table><thead><tr><th>Оплата</th><th class="num">Оформлено</th><th class="num">Скасовано</th><th class="num">Частка</th></tr></thead><tbody>${Object.entries(pay).map(([k,g])=>`<tr><td>${esc(k)}</td><td class="num">${g.n}</td><td class="num">${g.l}</td><td class="num">${pc(g.l,g.n)}</td></tr>`).join("")}</tbody></table></div></section>
+ <section class="card"><h3>Чому втрачаємо</h3><div class="tw"><table><tbody>${Object.entries(why).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<tr><td>${esc(k)}</td><td class="num">${v}</td></tr>`).join("")}</tbody></table></div></section>
+ <section class="card full" style="grid-column:1/-1"><h3>Завислі звернення</h3><p class="note">Активні звернення, з якими понад ${STALE} дні нічого не робили. У роздрібі клієнт за цей час зазвичай купує деінде.</p><div class="tw"><table><tbody>${stale.map(d=>`<tr><td>${esc(d.who)}</td><td>${esc(d.prod)}</td><td>${SN[d.st]}</td><td>${esc(d.ch)}</td><td class="num">${d.ago} дн.</td></tr>`).join("")||'<tr><td class="note">Немає</td></tr>'}</tbody></table></div></section></div>`}
+function render(){document.getElementById("nav").innerHTML=[["board","Воронка"],["rep","Звіт"]].map(([k,n])=>`<button role="tab" aria-selected="${tab==k}" data-tab="${k}">${n}</button>`).join("")+`<span class="spacer"></span><button data-reset="1">Почати спочатку</button>`;
+ document.getElementById("view").innerHTML=tab=="board"?vBoard():vRep()}
+document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const d=b.dataset;
+ if(d.tab){tab=d.tab;note=null;try{history.replaceState(null,"","#"+tab)}catch(_){}return render()}
+ if(d.reset){if(confirm("Почати спочатку? Усі ваші дії буде скасовано.")){S=INIT();note=null;save();render()}return}
+ if(d.deal){S.sel=d.deal;note=null;save();render();if(window.innerWidth<1100){const p=document.getElementById("panel");if(p)p.scrollIntoView({behavior:"smooth",block:"start"})}return}
+ if(d.add)return addAct(d.add,document.getElementById("act").value,document.getElementById("actn").value.trim());
+ if(d.move)return move(d.move);if(d.lose)return lose(d.lose,document.getElementById("why").value)});
+if(location.hash.slice(1)=="rep")tab="rep";
+render();
+</script></body></html>
